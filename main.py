@@ -6,7 +6,11 @@ from hu_style_sentenses import get_Hu_style_sentenses
 import random
 import tkinter as tk
 import hu_style_sentenses
-import webbrowser
+# import webbrowser
+from PIL import Image, ImageTk
+from memory_pic import *
+import base64,os
+
 
 # def 读JSON文件(fileName=""):
 #     import json
@@ -92,7 +96,7 @@ if __name__ == "__main__":
     window = tk.Tk()
     
     # 第2步，给窗口的可视化起名字
-    window.title('胡编乱造生成器V0.3')
+    window.title('胡编乱造生成器V1.0')
     
     # 第3步，设定窗口的大小(长 * 宽)
     window.geometry('1000x800')  # 这里的乘是小x
@@ -112,7 +116,13 @@ if __name__ == "__main__":
     frame_r = tk.Frame(frame)# 第二层frame，右frame，长在主frame上
     frame_l.pack(side='left')
     frame_r.pack(side='right')
-    
+
+    # 添加第三层 frame ，为图片留下空间
+    frame_r_r = tk.Frame(frame_r)
+    frame_r_r.pack(side='right')
+    frame_r_l = tk.Frame(frame_r)
+    frame_r_l.pack(side='left')
+
     # 第7步，创建标签，为第二层frame上面的内容，分为左区域和右区域，用不同颜色标识
     tk.Label(frame_l, text='请输入作者名字：',font=('Arial', 14)).pack() # author
     tk.Label(frame_l, text='请输入生成话题：', font=('Arial', 14)).pack() # topic  
@@ -120,33 +130,50 @@ if __name__ == "__main__":
     tk.Label(frame_l, text='每段字数(如:100)：', font=('Arial', 14)).pack() #
     
     author_txt = tk.StringVar()
-    author_txt.set("老H")
-    author_Entry = tk.Entry(frame_r, show=None, textvariable=author_txt, fg="gray", font=('Arial', 14))
-    author_Entry.pack()
+    author_txt.set("老胡")
+    author_Entry = tk.Entry(frame_r_l, show=None, textvariable=author_txt, fg="gray", font=('Arial', 14))
+    author_Entry.pack(padx=60)
 
     topic_txt = tk.StringVar()
     topic_txt.set("吴亦凡被锤")
-    topic_Entry = tk.Entry(frame_r, show=None, textvariable=topic_txt, fg="gray", font=('Arial', 14))
+    topic_Entry = tk.Entry(frame_r_l, show=None, textvariable=topic_txt, fg="gray", font=('Arial', 14))
     topic_Entry.pack()
 
     paragraph_num = tk.StringVar()
     paragraph_num.set("5")
-    paragraph_Entry = tk.Entry(frame_r, show=None, textvariable=paragraph_num, fg="gray", font=('Arial', 14))
+    paragraph_Entry = tk.Entry(frame_r_l, show=None, textvariable=paragraph_num, fg="gray", font=('Arial', 14))
     paragraph_Entry.pack()
 
     per_paragraph_num_max = tk.StringVar()
     per_paragraph_num_max.set("100")
-    per_paragraph_num_max_Entry = tk.Entry(frame_r, show=None, textvariable=per_paragraph_num_max, fg="gray", font=('Arial', 14))
+    per_paragraph_num_max_Entry = tk.Entry(frame_r_l, show=None, textvariable=per_paragraph_num_max, fg="gray", font=('Arial', 14))
     per_paragraph_num_max_Entry.pack()
     
-    article_var = tk.StringVar()
 
+    # # 放个图片 二维码
+    # 读图片
+    # image1 = Image.open("QR_arxivdaily.jpg").resize((80, 80),0)
+    # 从.py文件中读取图片
+    image1 = open("tmp_qr_code.jpg", 'wb')
+    image1.write(base64.b64decode(QR_arxivdaily_jpg))
+    image1.close()
+    image1 = Image.open("tmp_qr_code.jpg").resize((80, 80),0)
+    #删除临时图片
+    os.remove('tmp_qr_code.jpg')
+
+    photo = ImageTk.PhotoImage(image1)
+    w_photo = tk.Label(frame_r_r, text = "扫码关注公众号\n回复“胡编乱造”获取本软件源代码",compound = 'top',image=photo)
+    w_photo.pack(side='right',)
+
+
+    article_var = tk.StringVar()
     HU = HuStyle()
     # 设置'生成文章'按钮
-    generate_b = tk.Button(window, text='生成文章', font=('黑体', 19), width=10, height=1,relief='groove',fg='White', bg='SpringGreen2',command=HU.generate_Hu_style_article)
+    generate_b = tk.Button(window, text='生成文章', font=('黑体', 19), width=10, height=1,relief='groove',fg='White', bg='LightSeaGreen',command=HU.generate_Hu_style_article)
     generate_b.pack()
     # generate_b.pack(fill=tk.X,padx=180,pady=10)
     
+
     warning = tk.Label(window, text='警告！仅供娱乐，禁止用于其他任何场合！语料库来源于网络，不代表作者立场！',fg='red',font=('宋体', 13))
     warning.pack(pady=2) 
     # 一切滥用使用后果自负！
@@ -159,16 +186,16 @@ if __name__ == "__main__":
     article_text = tk.Text(window, width='90', height='23',font=('楷体', 15))
     article_text.pack()
 
-    # 设置label标签
-    link = tk.Label(window, text='GitHub源代码', font=('Arial', 10, 'underline'))
-    link.pack()
+    # # 设置label标签
+    # link = tk.Label(window, text='GitHub源代码', font=('Arial', 10, 'underline'))
+    # link.pack()
     
-    # 此处必须注意，绑定的事件函数中必须要包含event参数
-    def open_url(event):
-        webbrowser.open("https://github.com/mediatoreditor/HuEditorGenerator", new=0)
+    # # 此处必须注意，绑定的事件函数中必须要包含event参数
+    # def open_url(event):
+    #     webbrowser.open("https://github.com/mediatoreditor/HuEditorGenerator", new=0)
     
-    # 绑定label单击时间
-    link.bind("<Button-1>", open_url)
+    # # 绑定label单击时间
+    # link.bind("<Button-1>", open_url)
 
 
     tk.Label(window, text='Author：Mr.Green   Copyright (c) 2021\nAnti 996 License Version 1.0 (Draft)',fg='gray',font=('Arial', 9)).pack() # author
